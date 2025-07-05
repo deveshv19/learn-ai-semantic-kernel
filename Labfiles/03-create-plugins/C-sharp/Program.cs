@@ -29,7 +29,7 @@ kernel.Plugins.AddFromType<FlightBookingPlugin>("FlightBookingPlugin");
 
  PromptExecutionSettings openAIPromptExecutionSettings = new() 
  {
-     FunctionChoiceBehavior = FunctionChoiceBehavior.Required(functions: [search_flights]) 
+     FunctionChoiceBehavior = FunctionChoiceBehavior.Required(functions: [searchFlights]) 
  };
 
 
