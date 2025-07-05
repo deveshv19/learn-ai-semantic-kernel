@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
@@ -20,10 +20,17 @@ builder.AddAzureOpenAIChatCompletion(deploymentName, endpoint, apiKey);
 var kernel = builder.Build();
 var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
 
-// Add the plugin to the kernel
+// Add a plugin to the kernel*
+kernel.Plugins.AddFromType<FlightBookingPlugin>("FlightBookingPlugin");
 
 
 // Configure function choice behavior
+ KernelFunction searchFlights = kernel.Plugins.GetFunction("FlightBookingPlugin", "search_flights");
+
+ PromptExecutionSettings openAIPromptExecutionSettings = new() 
+ {
+     FunctionChoiceBehavior = FunctionChoiceBehavior.Required(functions: [search_flights]) 
+ };
 
 
 var history = new ChatHistory();
