@@ -25,6 +25,7 @@ var kernel = builder.Build();
 kernel.Plugins.AddFromType<FlightBookingPlugin>("FlightBookingPlugin");
 
 // Add the permission filter to the kernel
+ kernel.FunctionInvocationFilters.Add(new PermissionFilter());
 
 
 var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
@@ -58,11 +59,21 @@ void AddUserMessage(string msg)
     history.AddUserMessage(msg);
 }
 
-// Implement the function filter interface
-public class PermissionFilter
+// Create the function filer class
+public class PermissionFilter : IFunctionInvocationFilter
 {
 
-    // Implement the function invocation method
+     // Implement the function invocation method
+    public async Task OnFunctionInvocationAsync(FunctionInvocationContext context, Func<FunctionInvocationContext, Task> next)
+    {
+        if (!HasUserPermission(context.Function.PluginName, context.Function.Name))
+        {
+            context.Result = new FunctionResult(context.Result, "The operation was not approved by the user");
+            return;
+        }
+            
+        await next(context);
+    }
     
 
     private Boolean HasUserPermission(string pluginName, string functionName)
